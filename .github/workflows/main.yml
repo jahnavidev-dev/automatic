@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:{"main"}
+
+    AWS_Region : "us-east-1"
+    ECR_repository: "automatic"
+    ECS_Services : "EC2"
+
+    Contents : read
+     restore:
+         name : Restore
+         runs on : Ubuntu_latest
+     steps:
+         name : install package
+         uses : actions/checkout@v5.0.0
+         name : cache
+         uses : actions/cache@v4.2.4
+         with :
+            path : node_modules
+            key  : node_modules_v1
+            restore_keys :
+                   node_modules
+            name : Install dependencies
+            run  : npm ci 
+    
