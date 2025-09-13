@@ -1,25 +1,31 @@
+name: Build and Push Docker Image
+
 on:
   push:
-    branches:{"main"}
+    branches:
+      - main  # Trigger on push to main branch
 
-    AWS_Region : "us-east-1"
-    ECR_repository: "automatic"
-    ECS_Services : "EC2"
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
 
-    Contents : read
-     restore:
-         name : Restore
-         runs on : Ubuntu_latest
-     steps:
-         name : install package
-         uses : actions/checkout@v5.0.0
-         name : cache
-         uses : actions/cache@v4.2.4
-         with :
-            path : node_modules
-            key  : node_modules_v1
-            restore_keys :
-                   node_modules
-            name : Install dependencies
-            run  : npm ci 
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Docker image
+      run: docker build -t my-app:latest .
+
+    - name: Tag Docker image
+      run: docker tag my-app:latest ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+
+    - name: Push Docker image
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+
     
