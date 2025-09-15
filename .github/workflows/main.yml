@@ -2,8 +2,8 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches:
-      - main  # Trigger on push to main branch
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -19,8 +19,11 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build Docker image
-      run: docker build -t my-app:latest ./First-Project
+    - name: Show repo tree (debug)
+      run: ls -la && echo "----" && ls -la First-Project || true
+
+    - name: Build Docker image (explicit Dockerfile path)
+      run: docker build -f First-Project/Dockerfile -t my-app:latest First-Project
 
     - name: Tag Docker image
       run: docker tag my-app:latest ${{ secrets.DOCKER_USERNAME }}/my-app:latest
@@ -28,5 +31,3 @@ jobs:
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
 
-
-    
